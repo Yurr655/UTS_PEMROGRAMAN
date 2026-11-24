@@ -1,0 +1,320 @@
+
+<?php
+// Parent Class: Sepatu
+class Sepatu {
+    public $merk;
+    public $ukuran;
+    public $warna;
+
+    public function __construct($merk, $ukuran, $warna) {
+        $this->merk = $merk;
+        $this->ukuran = $ukuran;
+        $this->warna = $warna;
+    }
+
+    public function getInfoSepatu() {
+        return "Merk: {$this->merk}, Ukuran: {$this->ukuran}, Warna: {$this->warna}";
+    }
+}
+
+// Child Class: SepatuOlahraga
+class SepatuOlahraga extends Sepatu {
+    public $jenisOlahraga;
+
+    public function __construct($merk, $ukuran, $warna, $jenisOlahraga) {
+        parent::__construct($merk, $ukuran, $warna);
+        $this->jenisOlahraga = $jenisOlahraga;
+    }
+
+    // Override Method
+    public function getInfoSepatu() {
+        return parent::getInfoSepatu() .
+        ", Jenis Olahraga: {$this->jenisOlahraga}";
+    }
+}
+
+// Child Class: SepatuFormal
+class SepatuFormal extends Sepatu {
+    public $bahan;
+
+    public function __construct($merk, $ukuran, $warna, $bahan) {
+        parent::__construct($merk, $ukuran, $warna);
+        $this->bahan = $bahan;
+    }
+
+    // Override Method
+    public function getInfoSepatu() {
+        return parent::getInfoSepatu() .
+        ", Bahan: {$this->bahan}";
+    }
+}
+
+// Inisialisasi
+$sepatu_obj = null;
+$jenis_selected = $_POST['jenis'] ?? 'SepatuOlahraga';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    $merk = htmlspecialchars($_POST['merk']);
+    $ukuran = intval($_POST['ukuran']);
+    $warna = htmlspecialchars($_POST['warna']);
+
+    if ($jenis_selected === 'SepatuOlahraga') {
+
+        $olahraga = htmlspecialchars($_POST['olahraga']);
+
+        $sepatu_obj = new SepatuOlahraga(
+            $merk, $ukuran, $warna, $olahraga
+        );
+
+    } elseif ($jenis_selected === 'SepatuFormal') {
+
+        $bahan = htmlspecialchars($_POST['bahan']);
+
+        $sepatu_obj = new SepatuFormal(
+            $merk, $ukuran, $warna, $bahan
+        );
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Klasifikasi Sepatu</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #101827;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .card {
+            background: #1e293b;
+            padding: 25px;
+            border-radius: 15px;
+        }
+
+        h2 {
+            color: #60a5fa;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 7px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            box-sizing: border-box;
+            border-radius: 8px;
+            border: none;
+            background: #334155;
+            color: white;
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            margin-top: 20px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #334155;
+            border-radius: 8px;
+        }
+
+        @media(max-width: 650px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- Form Sepatu -->
+    <div class="card">
+        <h2>Klasifikasi Sepatu</h2>
+        <p>Penerapan OOP Inheritance pada Sepatu</p>
+
+        <form method="POST">
+
+            <label>Merk Sepatu</label>
+            <input type="text" name="merk"
+                placeholder="Contoh: Nike"
+                value="<?= htmlspecialchars($_POST['merk'] ?? '') ?>"
+                required>
+
+            <label>Ukuran Sepatu</label>
+            <input type="number" name="ukuran"
+                placeholder="Contoh: 42"
+                value="<?= htmlspecialchars($_POST['ukuran'] ?? '') ?>"
+                required>
+
+            <label>Warna Sepatu</label>
+            <input type="text" name="warna"
+                placeholder="Contoh: Hitam"
+                value="<?= htmlspecialchars($_POST['warna'] ?? '') ?>"
+                required>
+
+            <label>Jenis Sepatu</label>
+            <select name="jenis" id="jenis" onchange="toggleFields()">
+
+                <option value="SepatuOlahraga"
+                    <?= $jenis_selected === 'SepatuOlahraga' ? 'selected' : '' ?>>
+                    Sepatu Olahraga
+                </option>
+
+                <option value="SepatuFormal"
+                    <?= $jenis_selected === 'SepatuFormal' ? 'selected' : '' ?>>
+                    Sepatu Formal
+                </option>
+
+            </select>
+
+            <!-- Input Sepatu Olahraga -->
+            <div id="fields-olahraga">
+
+                <label>Jenis Olahraga</label>
+                <select name="olahraga">
+                    <option value="Lari">Lari</option>
+                    <option value="Basket">Basket</option>
+                    <option value="Futsal">Futsal</option>
+                </select>
+
+            </div>
+
+            <!-- Input Sepatu Formal -->
+            <div id="fields-formal">
+
+                <label>Bahan Sepatu</label>
+                <select name="bahan">
+                    <option value="Kulit Asli">Kulit Asli</option>
+                    <option value="Kulit Sintetis">Kulit Sintetis</option>
+                    <option value="Suede">Suede</option>
+                </select>
+
+            </div>
+
+            <button type="submit">
+                Tampilkan Detail Sepatu
+            </button>
+
+        </form>
+    </div>
+
+    <!-- Detail Sepatu -->
+    <div class="card">
+        <h2>Detail Sepatu</h2>
+
+        <?php if ($sepatu_obj !== null): ?>
+
+            <div class="info">
+
+                <h3><?= htmlspecialchars(get_class($sepatu_obj)) ?></h3>
+
+                <p>Merk:
+                    <?= htmlspecialchars($sepatu_obj->merk) ?>
+                </p>
+
+                <p>Ukuran:
+                    <?= htmlspecialchars((string)$sepatu_obj->ukuran) ?>
+                </p>
+
+                <p>Warna:
+                    <?= htmlspecialchars($sepatu_obj->warna) ?>
+                </p>
+
+                <?php if ($sepatu_obj instanceof SepatuOlahraga): ?>
+
+                    <p>Jenis Olahraga:
+                        <?= htmlspecialchars($sepatu_obj->jenisOlahraga) ?>
+                    </p>
+
+                <?php elseif ($sepatu_obj instanceof SepatuFormal): ?>
+
+                    <p>Bahan:
+                        <?= htmlspecialchars($sepatu_obj->bahan) ?>
+                    </p>
+
+                <?php endif; ?>
+
+                <hr>
+
+                <p><b>Info Method:</b></p>
+
+                <p>
+                    <?= htmlspecialchars($sepatu_obj->getInfoSepatu()) ?>
+                </p>
+
+            </div>
+
+        <?php else: ?>
+
+            <h3>👟 Data Sepatu Kosong</h3>
+
+            <p>Pilih jenis sepatu dan isi form untuk melihat detail sepatu.</p>
+
+        <?php endif; ?>
+
+    </div>
+
+</div>
+
+<script>
+function toggleFields() {
+
+    let jenis = document.getElementById("jenis").value;
+
+    let olahraga = document.getElementById("fields-olahraga");
+    let formal = document.getElementById("fields-formal");
+
+    olahraga.style.display =
+        jenis === "SepatuOlahraga" ? "block" : "none";
+
+    formal.style.display =
+        jenis === "SepatuFormal" ? "block" : "none";
+
+    olahraga.querySelector("select").disabled =
+        jenis !== "SepatuOlahraga";
+
+    formal.querySelector("select").disabled =
+        jenis !== "SepatuFormal";
+}
+
+toggleFields();
+</script>
+
+</body>
+</html>
